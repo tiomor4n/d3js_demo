@@ -1,0 +1,136 @@
+
+<html>
+    <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script src="js/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+	<!--<script src="js/ts2.js"></script>-->
+    
+    
+    </head>
+    <style>
+
+            .node circle {
+                fill: #fff;
+                stroke: steelblue;
+                stroke-width: 1.5px;
+            }
+
+            .node {
+                font: 12px sans-serif;
+            }
+
+            .link {
+                fill: none;
+                stroke: #ccc;
+                stroke-width: 1.5px;
+            }
+            </style>
+	
+    <body>
+        <div data-role="page" id="cartinfo">
+            <div data-role="header" data-position="fixed">
+                <!--<a href="/./buygether_bot/sellapp/" data-role="button" data-icon="home" data-transition="slide">銷售</a>-->
+                <h1>D3.js demo-tree map</h1>
+                <!--<a href="#" data-role="button" data-icon="star">購買</a>-->
+            </div>
+            <div data-role="content">
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <a href="bar_chart.html" data-role="button">bar chart</a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="pie_chart.html" data-role="button">pie chart</a>
+                    </div>
+                </div>
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <a href="tree_map.html" id="btn-paid" data-role="button">tree map</a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="#refundinfo" data-role="button">line chart</a>
+                    </div>
+                
+                </div>
+              
+                        <div class='container'>
+                            <svg class='svg' id="svg3"></svg>
+                        </div>
+                  
+        
+    </body>
+
+    <script>
+        var width = 500;
+        var height = 500;
+        var padding = {left:30, right:30, top:20, bottom:20};
+        //var width = parseInt(d3.select(".container").style("width"), 10) - (padding.left + padding.right);
+		//var height = parseInt(d3.select(".container").style("height"), 10) - (padding.top + padding.bottom);
+        
+
+
+        var body = d3.select("body");
+
+       
+
+        
+        var svg3 = body.select("#svg3")
+                      .attr("width", width)       //设定宽度
+                      .attr("height", height);    //设定高度
+       
+        
+        var tree = d3.layout.tree()
+            .size([width, height-200])
+            .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2); });
+
+        d3.json("tree_map_data.txt", function(error, root) {
+
+            var nodes = tree.nodes(root);
+            var links = tree.links(nodes);
+
+            console.log(nodes);
+            console.log(links);
+
+            var diagonal = d3.svg.diagonal()
+            .projection(function(d) { return [d.y, d.x]; });
+
+            var link = svg3.selectAll(".link")
+                .data(links)
+                .enter()
+                .append("path")
+                .attr("class", "link")
+                .attr("d", diagonal);   //使用对角线生成器
+
+                
+	
+            var node = svg3.selectAll(".node")
+                .data(nodes)
+                .enter()
+                .append("g")
+                .attr("class", "node")
+                .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+            
+            node.append("circle")
+                .attr("r", 4.5);
+            
+            node.append("text")
+                .attr("dx", function(d) { return d.children ? -8 : 8; })
+                .attr("dy", 3)
+                .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+                .text(function(d) { return d.name; });
+
+        });
+
+        
+
+        
+
+       
+
+    </script>
+</html>

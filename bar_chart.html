@@ -1,0 +1,430 @@
+<html>
+    <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script src="js/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+	<!--<script src="js/ts2.js"></script>-->
+    
+    
+    </head>
+    <style>
+            .axis path,
+            .axis line{
+                fill: none;
+                stroke: black;
+                shape-rendering: crispEdges;
+            }
+            
+            .axis text {
+                font-family: sans-serif;
+                font-size: 11px;
+            }
+
+            .MyRect {
+                fill: steelblue;
+            }
+            .MyRect2 {
+                fill: red;
+            }
+
+            .MyText {
+                fill: white;
+                text-anchor: middle;
+            }
+
+            .Mycontainer{
+                height:80%;
+                width:80%;
+            }
+
+            .shownSVG{
+                height:80%;
+                width:80%;
+            }
+            .container{
+                
+                display: block;
+                width: 100%;
+                height: 100%;
+                min-width: 300px;
+                max-width: 960px;
+                max-height: 500px;
+                overflow: hidden;
+             /*
+             display: inline-block;
+             position: relative;
+             width: 100%;
+             height:100%,
+             padding-bottom: 10%*/
+            }
+            </style>
+	
+    <body>
+        <div data-role="page" id="cartinfo">
+            <div data-role="header" data-position="fixed">
+                <!--<a href="/./buygether_bot/sellapp/" data-role="button" data-icon="home" data-transition="slide">銷售</a>-->
+                <h1>D3.js demo-bar chart</h1>
+                <!--<a href="#" data-role="button" data-icon="star">購買</a>-->
+            </div>
+            <div data-role="content">
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <a href="bar_chart.html" data-role="button">bar chart</a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="pie_chart.html" data-role="button">pie chart</a>
+                    </div>
+                </div>
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <a href="tree_map.html" id="btn-paid" data-role="button">tree map</a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a href="#refundinfo" data-role="button">line chart</a>
+                    </div>
+                
+                </div>
+              
+                        <div class=' container'>
+                            <svg class='svg'></svg>
+                        </div>
+                  
+        
+    </body>
+
+    <script>
+        var width = 500;
+        var height = 500;
+        var padding = {left:30, right:30, top:20, bottom:20};
+        //var width = parseInt(d3.select(".container").style("width"), 10) - (padding.left + padding.right);
+		//var height = parseInt(d3.select(".container").style("height"), 10) - (padding.top + padding.bottom);
+        console.log(width);
+        console.log(height);
+
+
+
+        var body = d3.select("body");
+
+       
+
+        
+        var svg = body.select("svg")
+                      .attr("width", width)       //设定宽度
+                      .attr("height", height)    //设定高度
+                      //.attr("viewBox", "0 0 960 500")
+                      //.attr("preserveAspectRatio", "xMidYMid meet");
+       
+        /*
+        var svg = container.append("svg")
+            .attr("id","shownSVG")
+            .attr("class","shownSVG")
+            .attr("preserveAspectRatio", "xMidYMid meet")
+            .attr("viewBox", "0 0 400 400");
+            */
+
+       // var width = $("#Mycontainer").width();
+       // var height = $("#Mycontainer").height();
+
+        //console.log(width);
+
+
+
+
+        //画布周边的空白
+        
+
+        //定义一个数组
+        ///var dataset = [10, 20, 30, 40, 33, 24, 12, 5, 12,20];
+        ///var dataset2 = [5, 10, 15, 20, 17, 12, 6, 5, 23,10];
+        //total = dataset + dataset2
+        ///var datasettotal = [15, 30, 45, 60, 50, 36, 18, 10, 35,30];
+
+        var dataall = [
+            {"data1":10,"data2":5},
+            {"data1":20,"data2":10},
+            {"data1":30,"data2":15},
+            {"data1":40,"data2":20},
+            {"data1":33,"data2":17},
+            {"data1":24,"data2":12},
+            {"data1":12,"data2":6},
+            {"data1":5,"data2":5},
+            {"data1":12,"data2":23},
+            {"data1":20,"data2":10}
+
+        ];
+        console.log(d3.map(dataall,function(d){
+            return d.data1;
+        }));
+
+        var piedataset = [ 30 , 10 , 43 , 55 , 13 ];
+
+
+        var dataset = [];
+        var dataset2=[];
+        var datasettotal=[];
+        dataall.forEach(function(d){
+            dataset.push(d.data1);
+            dataset2.push(d.data1);
+            datasettotal.push(d.data1 + d.data2);
+
+        });
+        
+            
+            
+        
+
+
+        //x轴的比例尺
+        var xScale = d3.scale.ordinal()
+            .domain(d3.range(dataset.length))
+            .rangeRoundBands([0, width - padding.left - padding.right]);
+        
+        var yScale = d3.scale.linear()
+            .domain([0,d3.max(datasettotal)])
+            .range([height-padding.top - padding.bottom,0]);
+
+        //定義x軸
+        var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom");
+        
+        //定義y軸
+        var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left");
+
+        //矩形之间的空白
+        var rectPadding = 4;  
+
+
+        svg.selectAll(".MyRect2")
+            .data(datasettotal)
+            .enter()
+            .append("rect")
+            .attr("class","MyRect2")
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr("x",function(d,i){
+                return xScale(i) + rectPadding/2;
+            })
+            .attr("y",function(d,i){
+                return yScale(d);
+            })
+            .attr("width", xScale.rangeBand() - rectPadding )
+            .attr("height", function(d){
+                return height - padding.top - padding.bottom - yScale(d);
+            });
+
+        //製作一另一個長方形，要顯示一個column資料有兩種的情況
+        svg.selectAll(".MyRect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("class","MyRect")
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr("x",function(d,i){
+                return xScale(i) + rectPadding/2;
+            })
+            .attr("y",function(d,i){
+                return yScale(d);
+            })
+            .attr("width", xScale.rangeBand() - rectPadding )
+            .attr("height", function(d){
+                return height - padding.top - padding.bottom - yScale(d);
+            });    
+
+        svg.selectAll(".MyText")
+            .data(dataset)
+            .enter()
+            .append("text")
+            .attr("class","MyText")
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function(d,i){
+                return xScale(i) + rectPadding/2;
+            })
+            .attr("y",function(d){
+                return yScale(d);
+            })
+            .attr("dx",function(){
+                return (xScale.rangeBand() - rectPadding)/2;
+            })
+            .attr("dy",function(d){
+                return 20;
+            })
+            .text(function(d){
+                return d;
+            });
+
+        svg.selectAll(".MyText2")
+            .data(datasettotal)
+            .enter()
+            .append("text")
+            .attr("class","MyText")
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .attr("x", function(d,i){
+                return xScale(i) + rectPadding/2;
+            })
+            .attr("y",function(d){
+                return yScale(d);
+            })
+            .attr("dx",function(){
+                return (xScale.rangeBand() - rectPadding)/2;
+            })
+            .attr("dy",function(d){
+                return 20;
+            })
+            .text(function(d,i){
+                return d-dataset[i];
+            });
+
+          
+
+        //添加x轴
+        svg.append("g")
+            .attr("class","axis")
+            .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
+            .call(xAxis); 
+
+        //添加y轴
+        svg.append("g")
+            .attr("class","axis")
+            .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+            .call(yAxis);
+
+        //pie圖
+        var pie = d3.layout.pie();
+        var piedata = pie(piedataset);
+        var outerRadius = 150; //外半径
+        var innerRadius = 0; //内半径，为0则中间没有空白
+
+        var arc = d3.svg.arc()  //弧生成器
+            .innerRadius(innerRadius)   //设置内半径
+            .outerRadius(outerRadius);  //设置外半径
+        
+        var arcs = svg2.selectAll("g")
+            .data(piedata)
+            .enter()
+            .append("g")
+            .attr("transform","translate("+ (width/2) +","+ (width/2) +")");
+
+        var color = d3.scale.category10();   //有十种颜色的颜色比例尺
+
+        arcs.append("path")
+            .attr("fill",function(d,i){
+                return color(i);
+            })
+            .attr("d",function(d){
+                return arc(d);   //调用弧生成器，得到路径值
+            });
+
+        
+
+        arcs.append("text")
+            .attr("class","MyText")
+            .attr("transform",function(d){
+                return "translate(" + arc.centroid(d) + ")";
+            })
+            .attr("text-anchor","middle")
+            .text(function(d){
+                return d.data;
+            });
+
+
+        function drawpic(dataall){
+            dataset = [];
+            dataset2=[];
+            datasettotal=[];
+            dataall.forEach(function(d){
+                dataset.push(d.data1);
+                dataset2.push(d.data1);
+                datasettotal.push(d.data1 + d.data2);
+            });
+    
+            xScale = d3.scale.ordinal()
+                .domain(d3.range(dataset.length))
+                .rangeRoundBands([0, width - padding.left - padding.right]);
+            
+            yScale = d3.scale.linear()
+                .domain([0,d3.max(datasettotal)])
+                .range([height-padding.top - padding.bottom,0]);
+
+            xAxis.scale(xScale);
+            yAxis.scale(yScale);
+
+            xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("bottom");
+  
+            yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+
+            svg.select('.x.axis')
+                .transition()
+                .duration(1000)
+                .attr('transform', 'translate(0,' + height + ')')
+                .call(xAxis)
+
+            svg.select('.y.axis')
+                .transition()
+                .duration(1000)
+
+            
+            svg.selectAll(".MyRect2")
+                .data(datasettotal)
+                .enter()
+                .append("rect")
+                .attr("class","MyRect2")
+                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                .attr("x",function(d,i){
+                    return xScale(i) + rectPadding/2;
+                })
+                .attr("y",function(d,i){
+                    return yScale(d);
+                })
+                .attr("width", xScale.rangeBand() - rectPadding )
+                .attr("height", function(d){
+                    return height - padding.top - padding.bottom - yScale(d);
+                });
+
+            svg.selectAll(".MyRect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr("class","MyRect")
+                .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+                .attr("x",function(d,i){
+                    return xScale(i) + rectPadding/2;
+                })
+                .attr("y",function(d,i){
+                    return yScale(d);
+                })
+                .attr("width", xScale.rangeBand() - rectPadding )
+                .attr("height", function(d){
+                    return height - padding.top - padding.bottom - yScale(d);
+                });  
+            
+
+
+
+ 
+        }
+
+        /*
+        function rendering(){
+            console.log('rendering');
+            width = parseInt(d3.select(".content").style("width"), 10) - (padding.left + padding.right);
+            height = parseInt(d3.select(".content").style("height"), 10) - (padding.top + padding.bottom);
+            drawpic(dataall);
+        }
+        */
+
+
+        //d3.select(window).on('resize', rendering);
+
+    </script>
+</html>
